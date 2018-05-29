@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {Stock, StockService} from '../stock.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { Stock, StockService } from '../stock.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+
 
 
 @Component({
@@ -11,7 +12,7 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 })
 export class StockFormComponent implements OnInit {
   formModel: FormGroup;
-  stock: Stock;
+  stock: Stock = new Stock(0,'',0,0,'',[]);
   categories = ['IT', '互联网', '金融'];
 
   constructor(
@@ -22,21 +23,37 @@ export class StockFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    let stockId;
-    stockId = this.routeInfo.snapshot.params['id'];
-    this.stock = this.stockService.getStock(stockId);
     let fb;
     fb = new FormBuilder();
     this.formModel = fb.group({
-      name: [this.stock.name, [Validators.required, Validators.minLength(3)]],
-      price: [this.stock.price, Validators.required],
-      desc: [this.stock.desc],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      price: ['', Validators.required],
+      desc: [''],
       categories: fb.array([
-        [this.stock.categories.indexOf(this.categories[0]) !== -1],
-        [this.stock.categories.indexOf(this.categories[1]) !== -1],
-        [this.stock.categories.indexOf(this.categories[2]) !== -1]
+        new FormControl(false),
+        new FormControl(false),
+        new FormControl(false)
       ], this.categoriesValid)
     });
+    let stockId;
+    stockId = this.routeInfo.snapshot.params['id'];
+    this.stockService.getStock(stockId)
+      .subscribe(
+        data => {
+          this.stock = data
+          this.formModel.reset({
+            name:data.name,
+            price:data.price,
+            desc:data.desc,
+            categories:[
+              data.categories.indexOf(this.categories[0])!=-1,
+              data.categories.indexOf(this.categories[1])!=-1,
+              data.categories.indexOf(this.categories[2])!=-1,
+            ]
+          });
+        } 
+      );
+
   }
 
   categoriesValid(event: FormArray) {
@@ -51,7 +68,7 @@ export class StockFormComponent implements OnInit {
     if (valid) {
       return null;
     } else {
-      return {categoriesLength: true};
+      return { categoriesLength: true };
     }
   }
 

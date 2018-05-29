@@ -30,6 +30,6 @@ export class Menu {
     public name: string,
     public link: string
   ) {
-
+console.log('');
   }
 }

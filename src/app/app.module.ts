@@ -15,6 +15,9 @@ import { StockFormComponent } from './stock/stock-form/stock-form.component';
 import { StockService } from './stock/stock.service';
 import { StockFilterPipe } from './stock/stock-filter.pipe';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { SocketService } from './header/socket.service';
+
 
 @NgModule({
   declarations: [
@@ -34,9 +37,13 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpModule
   ],
-  providers: [StockService],
+  providers: [
+    StockService,
+    SocketService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
